@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean[][] revealedGrid = new boolean[ROWS][COLS];  // track revealed cells
     private boolean[][] flaggedGrid = new boolean[ROWS][COLS];  // track flagged cells
     private boolean playerMode = true;  // true for pickaxe, false for flag
+    private boolean firstClick = true;  // track if first click has been made
 
     private TextView modeSwitch;
 
@@ -36,8 +37,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        placeMines();  // initialize mines
 
         cell_tvs = new ArrayList<TextView>();
 
@@ -95,6 +94,12 @@ public class MainActivity extends AppCompatActivity {
         int n = findIndexOfCellTextView(tv);
         int i = n / COLS;
         int j = n % COLS;
+
+        // if it's the player's first move, initialize all mines
+        if(firstClick) {
+            placeMines(i, j);
+            firstClick = false;
+        }
 
         // if pickaxe, reveal cell
         if(playerMode) {
@@ -163,16 +168,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // randomly place mines at start
-    private void placeMines() {
+    // randomly place mines at start, avoid cell that user clicked
+    private void placeMines(int excludeRow, int excludeCol) {
         Random random = new Random();
         int count = 0;
 
         while(count < TOTAL_MINES) {
             int row = random.nextInt(ROWS);
             int col = random.nextInt(COLS);
+            boolean inFirstClickArea = Math.abs(row - excludeRow) <= 1 && Math.abs(col - excludeCol) <= 1;
 
-            if(!mineGrid[row][col]) {
+            if(!mineGrid[row][col] && !inFirstClickArea) {
                 mineGrid[row][col] = true;
                 count ++;
             }
