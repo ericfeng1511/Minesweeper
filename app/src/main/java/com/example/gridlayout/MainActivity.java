@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView modeSwitch;
     private TextView flagCounter;
     private TextView timer;
+    private TextView gameMessage;  // displays winning/losing message upon game completion
 
     private int dpToPixel(int dp) {
         float density = Resources.getSystem().getDisplayMetrics().density;
@@ -55,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
 
         timer = findViewById(R.id.timerText);
         timer.setText("0");
+
+        gameMessage = findViewById(R.id.gameMessage);
+        gameMessage.setText("");
 
         cell_tvs = new ArrayList<TextView>();
 
@@ -135,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
                 if(mineGrid[i][j]) {
                     gameOver = true;
                     isTimerRunning = false;
+                    gameMessage.setText("Unlucky! Click to continue.");
                 }
 
                 else
@@ -232,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
         if(revealedCells == (TOTAL_CELLS - TOTAL_MINES)) {
             gameWon = true;
             isTimerRunning = false;
+            gameMessage.setText("Congrats! Click to continue.");
         }
     }
 
@@ -271,7 +277,8 @@ public class MainActivity extends AppCompatActivity {
     // show game over screen based on whether player won or lost
     private void gameOverScreen(boolean hasWon) {
         Intent intent = new Intent(this, GameOverActivity.class);
-        intent.putExtra("HAS_WON", hasWon);
+        intent.putExtra("HAS_WON", hasWon);  // pass win/loss status
+        intent.putExtra("ELAPSED_TIME", elapsedTime);  // pass elapsed time
 
         startActivity(intent);
     }
