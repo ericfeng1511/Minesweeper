@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 
@@ -17,7 +16,7 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity {
     private static final int ROWS = 12;
     private static final int COLS = 10;
-    private static final int TOTAL_MINES = 20;
+    private static final int TOTAL_MINES = 4;
 
     // save the TextViews of all cells in an array, so later on,
     // when a TextView is clicked, we know which cell it is
@@ -28,8 +27,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean playerMode = true;  // true for pickaxe, false for flag
     private boolean firstClick = true;  // track if first click has been made
     private boolean gameOver = false;  // track if the game is over
+    private int remainingFlags = TOTAL_MINES;  // track remaining flags (default = number of mines)
 
     private TextView modeSwitch;
+    private TextView flagCounter;
 
     private int dpToPixel(int dp) {
         float density = Resources.getSystem().getDisplayMetrics().density;
@@ -41,9 +42,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        flagCounter = findViewById(R.id.flagCounter);
+        flagCounter.setText(String.valueOf(remainingFlags));
+
         cell_tvs = new ArrayList<TextView>();
 
-        GridLayout grid = (GridLayout) findViewById(R.id.gridLayout01);
+        GridLayout grid = findViewById(R.id.gridLayout01);
         for (int i = 0; i < ROWS; i ++) {
             for (int j = 0; j < COLS; j ++) {
                 TextView tv = new TextView(this);
@@ -128,12 +132,20 @@ public class MainActivity extends AppCompatActivity {
                 if(flaggedGrid[i][j]) {
                     flaggedGrid[i][j] = false;
                     tv.setText("");
+
+                    // update flag counter
+                    remainingFlags ++;
+                    flagCounter.setText(String.valueOf(remainingFlags));
                 }
 
-                // else flag the cell
-                else {
+                // else if there are remaining flags, flag the cell
+                else if(remainingFlags > 0) {
                     flaggedGrid[i][j] = true;
                     tv.setText(getString(R.string.flag));
+
+                    // update flag counter
+                    remainingFlags --;
+                    flagCounter.setText(String.valueOf(remainingFlags));
                 }
             }
         }
