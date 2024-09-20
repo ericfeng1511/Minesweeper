@@ -3,9 +3,11 @@ package com.example.gridlayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.gridlayout.widget.GridLayout;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 
@@ -25,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean[][] flaggedGrid = new boolean[ROWS][COLS];  // track flagged cells
     private boolean playerMode = true;  // true for pickaxe, false for flag
     private boolean firstClick = true;  // track if first click has been made
+    private boolean gameOver = false;  // track if the game is over
 
     private TextView modeSwitch;
 
@@ -90,6 +93,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickTV(View view){
+        // if game is over, show game over screen
+        if(gameOver) {
+            gameOverScreen();
+            return;
+        }
+
         TextView tv = (TextView) view;
         int n = findIndexOfCellTextView(tv);
         int i = n / COLS;
@@ -103,8 +112,12 @@ public class MainActivity extends AppCompatActivity {
 
         // if pickaxe, reveal cell
         if(playerMode) {
-            if(!revealedGrid[i][j] && !flaggedGrid[i][j])
+            if(!revealedGrid[i][j] && !flaggedGrid[i][j]) {
                 revealCell(i, j);
+
+                if(mineGrid[i][j])
+                    gameOver = true;
+            }
         }
 
         // else flag cell
@@ -199,5 +212,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return count;
+    }
+
+    // show game over screen
+    private void gameOverScreen() {
+        Intent intent = new Intent(this, GameOverActivity.class);
+        startActivity(intent);
     }
 }
