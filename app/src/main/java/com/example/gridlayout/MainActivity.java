@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 
@@ -29,11 +30,15 @@ public class MainActivity extends AppCompatActivity {
     private boolean firstClick = true;  // track if first click has been made
     private boolean gameOver = false;  // track if the game is over
     private boolean gameWon = false;  // track if game was won (all non-mine cells revealed)
+    private boolean isTimerRunning = false;  // track timer running or not
     private int remainingFlags = TOTAL_MINES;  // track remaining flags (default = number of mines)
     private int revealedCells = 0;  // track num cells that have been revealed
+    private int elapsedTime = 0;  // track elapsed time
+    private Handler timeHandler = new Handler();  // handler for timer
 
     private TextView modeSwitch;
     private TextView flagCounter;
+    private TextView timer;
 
     private int dpToPixel(int dp) {
         float density = Resources.getSystem().getDisplayMetrics().density;
@@ -47,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
 
         flagCounter = findViewById(R.id.flagCounter);
         flagCounter.setText(String.valueOf(remainingFlags));
+
+        timer = findViewById(R.id.timerText);
+        timer.setText("0");
 
         cell_tvs = new ArrayList<TextView>();
 
@@ -115,6 +123,8 @@ public class MainActivity extends AppCompatActivity {
         if(firstClick) {
             placeMines(i, j);
             firstClick = false;
+
+            startTimer();  // start the timer at this stage
         }
 
         // if pickaxe, reveal cell
@@ -122,8 +132,10 @@ public class MainActivity extends AppCompatActivity {
             if(!revealedGrid[i][j] && !flaggedGrid[i][j]) {
                 revealCell(i, j);
 
-                if(mineGrid[i][j])
+                if(mineGrid[i][j]) {
                     gameOver = true;
+                    isTimerRunning = false;
+                }
 
                 else
                     checkWinCondition();
@@ -155,6 +167,21 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private void startTimer() {
+        isTimerRunning = true;
+        timeHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(isTimerRunning) {
+                    elapsedTime ++;
+                    timer.setText(String.valueOf(elapsedTime));
+
+                    timeHandler.postDelayed(this, 1000);
+                }
+            }
+        }, 1000);
     }
 
     // reveal cell and appropriate surrounding cells
@@ -202,9 +229,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkWinCondition() {
-        if(revealedCells == (TOTAL_CELLS - TOTAL_MINES))
+        if(revealedCells == (TOTAL_CELLS - TOTAL_MINES)) {
             gameWon = true;
-
+            isTimerRunning = false;
+        }
     }
 
     // randomly place mines at start, avoid cell that user clicked
