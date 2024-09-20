@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int ROWS = 12;
     private static final int COLS = 10;
     private static final int TOTAL_MINES = 4;
+    private static final int TOTAL_CELLS = ROWS * COLS;
 
     // save the TextViews of all cells in an array, so later on,
     // when a TextView is clicked, we know which cell it is
@@ -27,7 +28,9 @@ public class MainActivity extends AppCompatActivity {
     private boolean playerMode = true;  // true for pickaxe, false for flag
     private boolean firstClick = true;  // track if first click has been made
     private boolean gameOver = false;  // track if the game is over
+    private boolean gameWon = false;  // track if game was won (all non-mine cells revealed)
     private int remainingFlags = TOTAL_MINES;  // track remaining flags (default = number of mines)
+    private int revealedCells = 0;  // track num cells that have been revealed
 
     private TextView modeSwitch;
     private TextView flagCounter;
@@ -98,8 +101,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickTV(View view){
         // if game is over, show game over screen
-        if(gameOver) {
-            gameOverScreen();
+        if(gameOver || gameWon) {
+            gameOverScreen(gameWon);
             return;
         }
 
@@ -121,6 +124,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if(mineGrid[i][j])
                     gameOver = true;
+
+                else
+                    checkWinCondition();
             }
         }
 
@@ -178,6 +184,8 @@ public class MainActivity extends AppCompatActivity {
                 tv.setText("");
                 revealAdjacentCells(row, col);
             }
+
+            revealedCells ++;
         }
     }
 
@@ -191,6 +199,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private void checkWinCondition() {
+        if(revealedCells == (TOTAL_CELLS - TOTAL_MINES))
+            gameWon = true;
+
     }
 
     // randomly place mines at start, avoid cell that user clicked
@@ -226,9 +240,11 @@ public class MainActivity extends AppCompatActivity {
         return count;
     }
 
-    // show game over screen
-    private void gameOverScreen() {
+    // show game over screen based on whether player won or lost
+    private void gameOverScreen(boolean hasWon) {
         Intent intent = new Intent(this, GameOverActivity.class);
+        intent.putExtra("HAS_WON", hasWon);
+
         startActivity(intent);
     }
 }
