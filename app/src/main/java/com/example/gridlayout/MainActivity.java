@@ -140,6 +140,8 @@ public class MainActivity extends AppCompatActivity {
                     gameOver = true;
                     isTimerRunning = false;
                     gameMessage.setText("Unlucky! Click to continue.");
+
+                    revealAllMines();
                 }
 
                 else
@@ -169,6 +171,21 @@ public class MainActivity extends AppCompatActivity {
                     // update flag counter
                     remainingFlags --;
                     flagCounter.setText(String.valueOf(remainingFlags));
+                }
+            }
+        }
+    }
+
+    // reveal all mines (when player loses)
+    private void revealAllMines() {
+        for(int i = 0; i < ROWS; i ++) {
+            for(int j = 0; j < COLS; j ++) {
+                if(mineGrid[i][j]) {
+                    TextView tv = cell_tvs.get(i * COLS + j);
+
+                    // update visuals of cell to reveal mine
+                    tv.setText(getString(R.string.mine));
+                    tv.setBackgroundColor(Color.RED);
                 }
             }
         }
