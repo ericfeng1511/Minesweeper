@@ -26,7 +26,7 @@ public class GameOverActivity extends AppCompatActivity {
         Button playAgainButton = findViewById(R.id.playAgainButton);
 
         playAgainButton.setOnClickListener(view -> {
-            // restart main activity
+            // restart main activity; clear/reset everything
             Intent intent = new Intent(GameOverActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);

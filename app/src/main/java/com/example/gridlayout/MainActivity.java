@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         modeSwitch.setText(getString(R.string.pick));
         modeSwitch.setTextSize(32);
         modeSwitch.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-        modeSwitch.setOnClickListener(v -> switchMode());
+        modeSwitch.setOnClickListener(view -> switchMode());
     }
 
     // change player mode
@@ -234,9 +234,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkWinCondition() {
+        // player wins if all non-mine cells have been revealed
         if(revealedCells == (TOTAL_CELLS - TOTAL_MINES)) {
             gameWon = true;
-            isTimerRunning = false;
+            isTimerRunning = false;  // stop timer
             gameMessage.setText("Congrats! Click to continue.");
         }
     }
@@ -246,6 +247,7 @@ public class MainActivity extends AppCompatActivity {
         Random random = new Random();
         int count = 0;
 
+        // place TOTAL_MINES mines
         while(count < TOTAL_MINES) {
             int row = random.nextInt(ROWS);
             int col = random.nextInt(COLS);
